@@ -1,5 +1,10 @@
 class Curso:
     def __init__(self, nome: str, codigo: str):
+        if not isinstance (nome, str) or name.strip == "":
+            raise ValueError ('O curso deve ter um nome')
+        if not isinstance (codigo, str) or codigo.strip == "":
+            raise ValueError ('O curso deve ter um código')
+        
         self.nome = nome
         self.codigo = codigo
 
@@ -8,6 +13,12 @@ class Curso:
 
 class CursoBacharelado(Curso):
     def __init__(self, nome, codigo, duracao_anos):
+        try:
+            duracao_anos = int(duracao_anos)
+        except ValueError:
+            raise ValueError ('A duração deve ser um número inteiro')
+        if duracao_anos <= 0:
+            raise ValueError ('A duração deve ser maior que zero')
         super().__init__(nome, codigo)
         self.duracao_anos = duracao_anos
 
@@ -16,6 +27,12 @@ class CursoBacharelado(Curso):
 
 class CursoTecnico(Curso):
     def __init__(self, nome, codigo, carga_horaria):
+        try:
+            carga_horaria = int(carga_horaria)
+        except ValueError:
+            raise ValueError ('A carga horária deve ser um número inteiro')
+        if carga_horaria <= 0:
+            raise ValueError ('A carga horária deve ser maior que zero')
         super().__init__(nome, codigo)
         self.carga_horaria = carga_horaria
 
@@ -24,14 +41,20 @@ class CursoTecnico(Curso):
 
 class Campus:
     def __init__(self, nome: str, sigla: str):
+        if not isinstance (nome, str) or nome.strip == "":
+            raise ValueError ('O campus deve ter um nome')
+        if not isinstance (sigla, str) or len(sigla.strip()) < 2:
+            raise ValueError ('O campus deve ter uma sigla com mais de 2 caracteres')
         self.nome = nome
         self.sigla = sigla
-        self.cursos = []  # lista de cursos
+        self.cursos = [] 
 
     def adicionar_curso(self, curso: Curso):
+        if not isinstance (curso, Curso):
+            raise TypeError ('Somente cursos podem ser adicionados')
         for c in self.cursos:
             if c.codigo == curso.codigo:
-                print(f"Já existe curso com código {curso.codigo} no campus {self.sigla}")
+                raise ValueError (f"Já existe curso com código {curso.codigo} no campus {self.sigla}")
                 return False
         self.cursos.append(curso)
         return True
@@ -60,10 +83,12 @@ class Campus:
         if not curso:
             return False
         if novo_nome:
+            if not isinstance (novo_nome, str) or novo_nome.strip == "":
+                raise ValueError (' Nome inválido') 
             curso.nome = novo_nome
         if novo_codigo:
             if any(c.codigo == novo_codigo for c in self.cursos if c is not curso):
-                print("Já existe outro curso com esse novo código.")
+                raise ValueError ("Já existe outro curso com esse novo código.")
                 return False
             curso.codigo = novo_codigo
         return True
@@ -71,20 +96,20 @@ class Campus:
     def __str__(self):
         return f"Campus(sigla={self.sigla}, nome={self.nome}, total de cursos={len(self.cursos)})"
 
-
-# ----------- Subclasses (Herança) -----------
-
 class CampusPresencial(Campus):
     def __init__(self, nome, sigla, endereco):
+        if not isinstance(endereco, str) or endereco.strip() == "":
+            raise ValueError("Endereço inválido.")
         super().__init__(nome, sigla)
         self.endereco = endereco
 
     def __str__(self):
         return f"Campus Presencial({self.nome}, sigla={self.sigla}, endereço={self.endereco})"
 
-
 class CampusVirtual(Campus):
     def __init__(self, nome, sigla, plataforma):
+        if not isinstance(plataforma, str) or plataforma.strip() == "":
+            raise ValueError("Plataforma inválida.")
         super().__init__(nome, sigla)
         self.plataforma = plataforma
 
@@ -96,9 +121,11 @@ class SistemaUFC:
         self.campuses = []  # lista de Campus
 
     def adicionar_campus(self, campus: Campus):
+        if not isinstance (campus, Campus):
+            raise TypeError ('Somente campus presenciais ou virtuais são aceitos') 
         for c in self.campuses:
             if c.sigla == campus.sigla:
-                print(f"Já existe campus com sigla {campus.sigla}")
+                raise ValueError (f"Já existe campus com sigla {campus.sigla}")
                 return False
         self.campuses.append(campus)
         return True
